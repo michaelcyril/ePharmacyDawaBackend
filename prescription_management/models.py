@@ -10,7 +10,7 @@ class Prescription(models.Model):
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # image = models.ImageField()
+    image = models.ImageField(upload_to="uploads/prescription/", null=True, blank=True)
     status = models.CharField(choices=STATUS, default='INACTIVE', max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
 

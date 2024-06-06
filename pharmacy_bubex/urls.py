@@ -25,3 +25,5 @@ urlpatterns = [
     path('prescription-management/', include('prescription_management.urls', namespace="prescription_management")),
     path('order-management/', include('order_management.urls', namespace="order_management")),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -26,7 +26,7 @@ class Medicine(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=20)
     desease = models.ForeignKey(Desease, on_delete=models.SET_NULL, null=True)
-    image = models.ImageField()
+    image = models.ImageField(upload_to="uploads/medicines/", null=True, blank=True)
     type = models.CharField(choices=TYPE, default='DESEASE', max_length=20)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     active = models.BooleanField(default=True)

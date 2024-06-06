@@ -7,7 +7,7 @@ class PrescriptionPostSerializer(serializers.ModelSerializer):
         model = Prescription
         fields = [
             'user',
-            # 'image',
+            'image',
         ]
 
 class PrescriptionGetSerializer(serializers.ModelSerializer):

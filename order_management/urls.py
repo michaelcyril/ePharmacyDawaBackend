@@ -3,5 +3,7 @@ from .views import *
 app_name = 'order_management'
 
 urlpatterns = [
-    # path('create-get-wallet', CreateGetWalletView.as_view(), name="create_get_wallet"),
+    path('insert-get-desease', CreateGetDeseaseView.as_view()),
+    path('delete-update-desease', UpdateDeleteDeseaseView.as_view()),
+    # path('change-desease-status', ChangePrescriptionStatusView.as_view()),
 ]

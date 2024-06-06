@@ -45,7 +45,7 @@ class VerifyPhone(APIView):
                     "username": data['phone'],
                     "otp": otp_code,
                     "phone": data['phone'],
-                    "role": data["type"],
+                    "role": data["role"],
                     "password": "123"
                 }
                 serializer = UserSerializer(data=user_data)
@@ -56,14 +56,15 @@ class VerifyPhone(APIView):
                     return Response(message)
                 return Response({'request': False, 'errors': serializer.errors})
             user = User.objects.get(phone=data['phone'])
-            if user.role == data['type']:
-                user.otp = otp_code
-                user.otp_created_at = timezone.now()
-                # pushMessage(otp_code, data['phone'])
-                user.save()
-                return Response({"request": True})
-            return Response({'request': False})
-        except:
+            # if user.role == data['role']:
+            user.otp = otp_code
+            user.otp_created_at = timezone.now()
+            # pushMessage(otp_code, data['phone'])
+            user.save()
+            return Response({"request": True})
+            # return Response({'request': False})
+        except Exception as e:
+            print(e)
             return Response({'request': False})
 
 
@@ -78,6 +79,7 @@ class VerifyOtp(APIView):
     def post(request):
         try:
             data = request.data
+            print(data)
             users = User.objects.filter(phone=data['phone'])
             if len(users) == 0:
                 return Response({'success': False})
@@ -95,6 +97,7 @@ class VerifyOtp(APIView):
                     token, created = Token.objects.get_or_create(user=user)
                     user_id = User.objects.get(username=data['phone'])
                     user_info = UserSerializer(instance=user_id, many=False).data
+                    print(user_info)
                     response = {
                         'token': token.key,
                         'user': user_info,
@@ -126,9 +129,10 @@ class CompleteUserProfile(APIView):
             data = request.data
             try:
                 user = User.objects.get(id=data['id'])
-                user.dob = data['dob']
+                user.age = data['age']
                 user.gender = data['gender']
                 user.address = data['address']
+                user.first_name = data['name']
                 user.profileComplete = True
                 user.save()
                 return Response({"update": True})
@@ -139,7 +143,7 @@ class CompleteUserProfile(APIView):
 
 # {
 #     "id":"",
-#     "dob": "11-11-2024",
+#     "age": "12",
 #     "gender": "MALE",
 #     "address": 12
 # }
@@ -150,3 +154,41 @@ class AllUser(APIView):
     def get(request):
         users = User.objects.values("id").all()
         return Response(users)
+
+
+class RegisterUser(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        data = request.data
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            phone = data['phone']
+            user = User.objects.filter(phone=phone)
+            if user:
+                message = {'save': False, 'message': 'phone number already exists'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            if data['role'] == "ADMIN":
+                userr = serializer.save()
+                return Response({"save": True})
+            else:
+                return Response({"save": False, "message": "Only For Pharmacist"})
+
+        message = {'save': False, 'errors': serializer.errors}
+        return Response(message)
+
+    @staticmethod
+    def get(request):
+        users  = User.objects.all()
+        return Response(UserSerializer(instance=users, many=True).data)
+
+# {
+#     "username":"255693331837",
+#     "password":"123",
+#     "phone":"255693331837",
+#     "role":"ADMIN",
+#     "age": 45,
+#     "gender": "MALE",
+#     "address": "Kimara",
+#     "profileComplete": True
+# }

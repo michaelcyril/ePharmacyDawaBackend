@@ -9,7 +9,7 @@ from django.db.models import Q
 
 
 class CreateGetDeseaseView(APIView):
-    permission_classes = [IsAuthenticated, ]
+    # permission_classes = [IsAuthenticated, ]
     model = Desease
     post_serializer_class = DeseasePostSerializer
     get_serializer_class = DeseaseGetSerializer
