@@ -5,5 +5,9 @@ app_name = 'order_management'
 urlpatterns = [
     path('insert-get-desease', CreateGetDeseaseView.as_view()),
     path('delete-update-desease', UpdateDeleteDeseaseView.as_view()),
-    # path('change-desease-status', ChangePrescriptionStatusView.as_view()),
+    path('insert-get-medicine', CreateGetMedicineView.as_view()),
+    path('delete-update-medicine', UpdateDeleteMedicineView.as_view()),
+    path('insert-get-order', CreateGetOrderView.as_view()),
+    path('get-order-history', OrderHistoryView.as_view()),
+    path('delete-update-order', UpdateDeleteOrderView.as_view()),
 ]

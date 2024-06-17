@@ -21,6 +21,8 @@ class MedicinePostSerializer(serializers.ModelSerializer):
         model = Medicine
         fields = [
             'name',
+            'description',
+            'dosage',
             'desease',
             'image',
             'type',

@@ -38,9 +38,9 @@ class UpdateDeleteDeseaseView(APIView):
             desease.name = data['name']
             desease.active = data['active']
             desease.save()
-            return Response({"success": True})
+            return Response({"update": True})
         except self.model.DoesNotExist:
-            return Response({"success": False})
+            return Response({"update": False})
 
     def get(self, request):
         try:
@@ -95,6 +95,7 @@ class UpdateDeleteMedicineView(APIView):
         try:
             medicine = self.model.get(id=data['id'])
             medicine.name = data['name']
+            medicine.description = data['description']
             medicine.desease = data['desease']
             medicine.type = data['type']
             medicine.price = data['price']
@@ -145,6 +146,17 @@ class CreateGetOrderView(APIView):
             return Response(serialized.data)
         else:
             return Response([])
+
+
+class OrderHistoryView(APIView):
+    permission_classes = [AllowAny, ]
+    model = Order
+    get_serializer_class = MedicineGetSerializer
+
+    def get(self, request):
+        queryset = self.model.objects.filter(status="PENDING")
+        serialized = self.get_serializer_class(instance=queryset, many=True)
+        return Response(serialized.data)
 
 
 class UpdateDeleteOrderView(APIView):
