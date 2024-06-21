@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    'channels',
+    'social_management',
     'user_management',
     'prescription_management',
     'order_management',
@@ -86,6 +88,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'pharmacy_bubex.routing.application'
 WSGI_APPLICATION = 'pharmacy_bubex.wsgi.application'
 
 

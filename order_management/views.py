@@ -125,7 +125,10 @@ class CreateGetOrderView(APIView):
         data = request.data
         serialized = self.post_serializer_class(data=data)
         if serialized.is_valid():
-            serialized.save()
+            order = serialized.save()
+            for medicine in data['medicines']:
+                mdcn = Medicine.objects.get(id=medicine['id'])
+                orederMedicine = OrderMedicine.objects.create(medicine=mdcn, order=order, dosage=medicine['dosage'])
             return Response({"save": True})
         return Response({"save": False})
 

@@ -22,6 +22,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user-management/', include('user_management.urls', namespace="user_management")),
+    path('social-management/', include('social_management.urls', namespace="social_management")),
     path('prescription-management/', include('prescription_management.urls', namespace="prescription_management")),
     path('order-management/', include('order_management.urls', namespace="order_management")),
 ]
