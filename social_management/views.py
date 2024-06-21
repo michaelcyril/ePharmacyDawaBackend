@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import *
 from .models import *
-from user_management.models import Account, User
+from user_management.models import User
 from django.db.models import Q
 from .channel_manager import PostToChatChannel
 

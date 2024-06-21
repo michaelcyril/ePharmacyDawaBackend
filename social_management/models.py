@@ -1,6 +1,5 @@
 from django.db import models
 import uuid
-from user_management.models import Account
 from django.conf import settings
 
 
