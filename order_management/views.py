@@ -68,20 +68,26 @@ class CreateGetMedicineView(APIView):
         return Response({"save": False})
 
     def get(self, request):
-        t = request.GET.get("t")
-        q = request.GET.get("q")
-        if q == "single":
-            d = request.GET.get("d")
+        query_type = request.GET.get("query_type")
+        if query_type == "disease":
+            disease_id = request.GET.get("disease_id")
             try:
                 desease = Desease.objects.get(id=d)
-                queryset = self.model.objects.filter(Q(desease=desease)&Q(type=t))
+                queryset = self.model.objects.filter(desease=desease, active=True)
                 serialized = self.get_serializer_class(instance=queryset, many=True)
                 return Response(serialized.data)
             except Desease.DoesNotExist:
                 return Response([])
-        elif q == "all":
-            desease = Desease.objects.get(id=d)
-            queryset = self.model.objects.filter(Q(type=t))
+        if query_type == "all_disease":
+            queryset = self.model.objects.filter(type="DESEASE", active=True)
+            serialized = self.get_serializer_class(instance=queryset, many=True)
+            return Response(serialized.data)
+        elif query_type == "otc":
+            queryset = self.model.objects.filter(type="OTC", active=True)
+            serialized = self.get_serializer_class(instance=queryset, many=True)
+            return Response(serialized.data)
+        elif query_type == "all":
+            queryset = self.model.objects.filter(active=True)
             serialized = self.get_serializer_class(instance=queryset, many=True)
             return Response(serialized.data)
         else:
@@ -108,7 +114,8 @@ class UpdateDeleteMedicineView(APIView):
         try:
             id = request.GET.get("id")
             medicine = self.model.objects.get(id=id)
-            medicine.delete()
+            medicine.active = False
+            medicine.save()
             return Response({"delete": True})
         except self.model.DoesNotExist:
             return Response({"delete": False})
@@ -126,27 +133,36 @@ class CreateGetOrderView(APIView):
         serialized = self.post_serializer_class(data=data)
         if serialized.is_valid():
             order = serialized.save()
-            for medicine in data['medicines']:
-                mdcn = Medicine.objects.get(id=medicine['id'])
-                orederMedicine = OrderMedicine.objects.create(medicine=mdcn, order=order, dosage=medicine['dosage'])
             return Response({"save": True})
         return Response({"save": False})
 
     def get(self, request):
-        id = request.GET.get("id")
-        q = request.GET.get("q")
-        if q == "single":
+        query_type = request.GET.get("query_type")
+        if query_type == "client_order":
             try:
-                client = self.user_model.objects.get(id=id)
-                queryset = self.model.objects.filter(Q(client=client))
-                serialized = self.get_serializer_class(instance=queryset, many=True)
-                return Response(serialized.data)
+                client_id = request.GET.get("client_id")
+                order_status = request.GET.get("order_status")
+                client = self.user_model.objects.get(id=client_id)
+                if order_status:
+                    queryset = self.model.objects.filter(client=client, status=order_status, active=True)
+                    serialized = self.get_serializer_class(instance=queryset, many=True)
+                    return Response(serialized.data)
+                else:
+                    queryset = self.model.objects.filter(client=client, active=True)
+                    serialized = self.get_serializer_class(instance=queryset, many=True)
+                    return Response(serialized.data)
             except self.user_model.DoesNotExist:
                 return Response([])
-        elif q == "all":
-            queryset = self.model.objects.all()
-            serialized = self.get_serializer_class(instance=queryset, many=True)
-            return Response(serialized.data)
+        elif query_type == "pharmacist_order":
+            order_status = request.GET.get("order_status")
+            if order_status:
+                queryset = self.model.objects.filter(status=order_status, active=True)
+                serialized = self.get_serializer_class(instance=queryset, many=True)
+                return Response(serialized.data)
+            else:
+                queryset = self.model.objects.filter(active=True)
+                serialized = self.get_serializer_class(instance=queryset, many=True)
+                return Response(serialized.data)
         else:
             return Response([])
 
@@ -179,7 +195,8 @@ class UpdateDeleteOrderView(APIView):
         try:
             id = request.GET.get("id")
             order = self.model.objects.get(id=id)
-            order.delete()
+            order.active = False
+            order.save()
             return Response({"delete": True})
         except self.model.DoesNotExist:
             return Response({"delete": False})

@@ -4,14 +4,17 @@ import uuid
 
 class Prescription(models.Model):
     STATUS = (
-        ("DELETED", "User deleted"),
-        ("ACTIVE", "Active user"),
-        ("INACTIVE", "Inactive user"),
+        ("PENDING", "Pending"),
+        ("COMPLETE", "Complete"),
+        ("CANCELED", "Canceled"),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="uploads/prescription/", null=True, blank=True)
     status = models.CharField(choices=STATUS, default='INACTIVE', max_length=20)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

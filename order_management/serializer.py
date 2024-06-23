@@ -36,23 +36,6 @@ class MedicineGetSerializer(serializers.ModelSerializer):
         depth = 2
 
 
-class OrderPostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = [
-            'client',
-            'prescription',
-            'total_price',
-            'description',
-        ]
-
-class OrderGetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = "__all__"
-        depth = 2
-
-
 class OrderMedicinePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderMedicine
@@ -65,6 +48,31 @@ class OrderMedicinePostSerializer(serializers.ModelSerializer):
 class OrderMedicineGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderMedicine
+        fields = "__all__"
+        depth = 2
+
+
+class OrderPostSerializer(serializers.ModelSerializer):
+    order_medicine = OrderMedicinePostSerializer(many=True)
+    class Meta:
+        model = Order
+        fields = [
+            'client',
+            'prescription',
+            'total_price',
+            'description',
+            'order_medicine',
+        ]
+    def create(self, validated_data):
+        order_medicine = validated_data.pop('order_medicine')
+        order = Order.objects.create(**validated_data)
+        for medicine in order_medicine:
+            OrderMedicine.objects.create(order=order, **medicine)
+        return order
+
+class OrderGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
         fields = "__all__"
         depth = 2
 

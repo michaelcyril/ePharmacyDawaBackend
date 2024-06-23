@@ -8,6 +8,10 @@ from user_management.models import User
 
 
 class PrescriptionView(APIView):
+    model = Prescription
+    get_serializer_class = PrescriptionGetSerializer
+    post_serializer_class = PrescriptionPostSerializer
+    user_model = User
     @staticmethod
     def post(request):
         data = request.data
@@ -23,22 +27,33 @@ class PrescriptionView(APIView):
 
     @staticmethod
     def get(request):
-        try:
-            q = request.GET.get("q")
-            if q == "s":
-                id = request.GET.get("id")
-                user = User.objects.get(id=id)
-                prescription = Prescription.objects.filter(user=user)
-                serialized = PrescriptionGetSerializer(instance=prescription, many=True)
-                return Response(serialized.data)
-            elif q == "a":
-                prescription = Prescription.objects.all()
-                serialized = PrescriptionGetSerializer(instance=prescription, many=True)
+        query_type = request.GET.get("query_type")
+        if query_type == "client_prescription":
+            try:
+                client_id = request.GET.get("client_id")
+                prescription_status = request.GET.get("prescription_status")
+                user = self.user_model.objects.get(id=client_id)
+                if prescription_status:
+                    queryset = self.model.objects.filter(user=user, status=prescription_status, active=True)
+                    serialized = self.get_serializer_class(instance=queryset, many=True)
+                    return Response(serialized.data)
+                else:
+                    queryset = self.model.objects.filter(client=client, active=True)
+                    serialized = self.get_serializer_class(instance=queryset, many=True)
+                    return Response(serialized.data)
+            except self.user_model.DoesNotExist:
+                return Response([])
+        elif query_type == "pharmacist_prescription":
+            prescription_status = request.GET.get("prescription_status")
+            if order_status:
+                queryset = self.model.objects.filter(status=prescription_status, active=True)
+                serialized = self.get_serializer_class(instance=queryset, many=True)
                 return Response(serialized.data)
             else:
-                return Response([])
-
-        except User.DoesNotExist:
+                queryset = self.model.objects.filter(active=True)
+                serialized = self.get_serializer_class(instance=queryset, many=True)
+                return Response(serialized.data)
+        else:
             return Response([])
 
 

@@ -20,7 +20,7 @@ class Desease(models.Model):
 
 class Medicine(models.Model):
     TYPE = (
-        ("OTP", "Otp"),
+        ("OTC", "Otc"),
         ("DESEASE", "Desease"),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -45,8 +45,8 @@ class Medicine(models.Model):
 class Order(models.Model):
     STATUS = (
         ("PENDING", "Pending"),
-        ("PROCESSING", "Processing"),
-        ("DELIVERED", "Delivered"),
+        ("COMPLETE", "Complete"),
+        ("CANCELED", "Canceled"),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     client = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -70,6 +70,7 @@ class OrderMedicine(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     dosage = models.CharField(max_length=255)
+    active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
