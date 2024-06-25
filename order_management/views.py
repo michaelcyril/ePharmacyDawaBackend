@@ -53,7 +53,7 @@ class UpdateDeleteDeseaseView(APIView):
 
 
 class CreateGetMedicineView(APIView):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [AllowAny, ]
     model = Medicine
     post_serializer_class = MedicinePostSerializer
     get_serializer_class = MedicineGetSerializer
@@ -72,9 +72,10 @@ class CreateGetMedicineView(APIView):
         if query_type == "disease":
             disease_id = request.GET.get("disease_id")
             try:
-                desease = Desease.objects.get(id=d)
+                desease = Desease.objects.get(id=disease_id)
                 queryset = self.model.objects.filter(desease=desease, active=True)
                 serialized = self.get_serializer_class(instance=queryset, many=True)
+                print(serialized.data)
                 return Response(serialized.data)
             except Desease.DoesNotExist:
                 return Response([])

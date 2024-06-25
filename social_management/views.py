@@ -15,9 +15,10 @@ class ConversationView(APIView):
     def post(request):
         data = request.data
         user1 = User.objects.get(id=data['initiator'])
-        user2 = User.objects.get(id=data['receiver'])
+        # user2 = User.objects.get(id=data['receiver'])
+        user2 = 1
         conversation = Conversation.objects.filter(
-            (Q(initiator=user1) & Q(receiver=user2)) | (Q(initiator=user2) & Q(receiver=user1)))
+            (Q(initiator=user1) & Q(receiver=user2)))
         if len(conversation) >= 1:
             return Response({"save": False, "conv_id": conversation[0].id})
         serialized = ConversationPostSerializer(data=data)
@@ -28,8 +29,15 @@ class ConversationView(APIView):
     @staticmethod
     def get(request):
         try:
-            user = User.objects.get(id=request.GET.get('user_id'))
-            queryset = Conversation.objects.filter(Q(receiver=user) | Q(initiator=user))
+            initiator = request.GET.get('user_id')
+            user_type = request.GET.get('user_type')
+            if user_type == "normal":
+                user = User.objects.get(id=request.GET.get('user_id'))
+                queryset = Conversation.objects.filter(Q(initiator=user))
+            elif user_type == "admin":
+                queryset = Conversation.objects.filter(Q(receiver=1))
+            else:
+                return Response([])
             serialized = ConversationGetSerializer(instance=queryset, many=True)
             return Response(serialized.data)
         except:

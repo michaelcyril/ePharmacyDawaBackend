@@ -11,7 +11,7 @@ class Desease(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.status}'
+        return f'{self.name}'
 
     class Meta:
         db_table = 'desease'
@@ -35,7 +35,7 @@ class Medicine(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f''
+        return f'{self.name}'
 
     class Meta:
         db_table = 'medicine'
