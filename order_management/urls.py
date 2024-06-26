@@ -10,4 +10,6 @@ urlpatterns = [
     path('insert-get-order', CreateGetOrderView.as_view()),
     path('get-order-history', OrderHistoryView.as_view()),
     path('delete-update-order', UpdateDeleteOrderView.as_view()),
+    path('get-order-products', OrderProductsView.as_view()),
+    path('update-order-status', UpdateOrderStatusView.as_view()),
 ]

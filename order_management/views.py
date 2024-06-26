@@ -123,17 +123,18 @@ class UpdateDeleteMedicineView(APIView):
 
 
 class CreateGetOrderView(APIView):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [AllowAny, ]
     model = Order
-    post_serializer_class = MedicinePostSerializer
-    get_serializer_class = MedicineGetSerializer
+    post_serializer_class = OrderPostSerializer
+    get_serializer_class = OrderGetSerializer
     user_model = User
 
     def post(self, request):
         data = request.data
         serialized = self.post_serializer_class(data=data)
         if serialized.is_valid():
-            order = serialized.save()
+            order_id = f"ORDER{timezone.now().strftime('%H%M%S')}"
+            serialized.save(order_id=order_id)
             return Response({"save": True})
         return Response({"save": False})
 
@@ -171,7 +172,7 @@ class CreateGetOrderView(APIView):
 class OrderHistoryView(APIView):
     permission_classes = [AllowAny, ]
     model = Order
-    get_serializer_class = MedicineGetSerializer
+    get_serializer_class = OrderGetSerializer
 
     def get(self, request):
         queryset = self.model.objects.filter(status="PENDING")
@@ -249,3 +250,32 @@ class UpdateDeleteOrderMedicineView(APIView):
             return Response({"delete": True})
         except self.model.DoesNotExist:
             return Response({"delete": False})
+
+
+class OrderProductsView(APIView):
+    permission_classes = [AllowAny, ]
+    model = OrderMedicine
+    get_serializer_class = OrderMedicineGetSerializer
+
+    def get(self, request):
+        order_id = request.GET.get("order_id")
+        try:
+            order = Order.objects.get(id=order_id)
+            queryset = self.model.objects.filter(order=order)
+            serialized = self.get_serializer_class(instance=queryset, many=True)
+            return Response(serialized.data)
+        except Order.DoesNotExist:
+            return Response([])
+
+
+class UpdateOrderStatusView(APIView):
+    model = Order
+    def post(self, request):
+        data = request.data
+        try:
+            order = self.model.objects.get(id=data['id'])
+            order.status = data['status']
+            order.save()
+            return Response({"success": True})
+        except self.model.DoesNotExist:
+            return Response({"success": False})

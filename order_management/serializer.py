@@ -43,6 +43,8 @@ class OrderMedicinePostSerializer(serializers.ModelSerializer):
             'medicine',
             'order',
             'dosage',
+            'quantity',
+            'total_amount',
         ]
 
 class OrderMedicineGetSerializer(serializers.ModelSerializer):
@@ -58,9 +60,9 @@ class OrderPostSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             'client',
-            'prescription',
+            # 'prescription',
             'total_price',
-            'description',
+            # 'description',
             'order_medicine',
         ]
     def create(self, validated_data):
