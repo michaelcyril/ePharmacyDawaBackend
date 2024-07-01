@@ -51,7 +51,7 @@ class VerifyPhone(APIView):
                 serializer = UserSerializer(data=user_data)
                 if serializer.is_valid():
                     user = serializer.save()
-                    # pushMessage(otp_code, data['phone'])
+                    pushMessage(otp_code, data['phone'])
                     message = {'request': True}
                     return Response(message)
                 return Response({'request': False, 'errors': serializer.errors})
