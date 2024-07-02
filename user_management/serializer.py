@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'age',
             'phone',
+            'otp',
             'gender',
             'address',
             'profileComplete',

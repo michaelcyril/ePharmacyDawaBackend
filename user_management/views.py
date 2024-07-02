@@ -84,6 +84,7 @@ class VerifyOtp(APIView):
             if len(users) == 0:
                 return Response({'success': False})
             user1 = User.objects.get(phone=data['phone'])
+            print(user1.otp)
             if user1.otp == data['otp']:
                 current_time = timezone.now()
                 time_difference = current_time - user1.otp_created_at
@@ -111,6 +112,7 @@ class VerifyOtp(APIView):
                     }
 
                     return Response(response)
+            print("====")
             return Response({"success": False})
         except:
             return Response({"success": False})
