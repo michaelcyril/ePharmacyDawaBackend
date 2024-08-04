@@ -5,6 +5,7 @@ import uuid
 class Prescription(models.Model):
     STATUS = (
         ("PENDING", "Pending"),
+        ("PROCEED", "Proceed"),
         ("COMPLETE", "Complete"),
         ("CANCELED", "Canceled"),
     )

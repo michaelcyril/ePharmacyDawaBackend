@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from user_management.models import User
 import uuid
+from django.db.models import Q
 
 
 class PrescriptionView(APIView):
@@ -35,6 +36,11 @@ class PrescriptionView(APIView):
                 user = self.user_model.objects.get(id=client_id)
                 if prescription_status:
                     queryset = self.model.objects.filter(user=user)
+                    if prescription_status == "PENDING":
+                        print("----------")
+                        queryset = queryset.filter(Q(status="PENDING") | Q(status="PROCEED")).filter(active=True)
+                        serialized = self.get_serializer_class(instance=queryset, many=True)
+                        return Response(serialized.data)
                     queryset = queryset.filter(status=prescription_status).filter(active=True)
                     serialized = self.get_serializer_class(instance=queryset, many=True)
                     return Response(serialized.data)
@@ -47,6 +53,10 @@ class PrescriptionView(APIView):
         elif query_type == "pharmacist_prescription":
             prescription_status = request.GET.get("prescription_status")
             if prescription_status:
+                if prescription_status == "PENDING":
+                    queryset = self.model.objects.filter(Q(status="PENDING") | Q(status="PROCEED")).filter(active=True)
+                    serialized = self.get_serializer_class(instance=queryset, many=True)
+                    return Response(serialized.data)
                 queryset = self.model.objects.filter(status=prescription_status, active=True)
                 serialized = self.get_serializer_class(instance=queryset, many=True)
                 return Response(serialized.data)
