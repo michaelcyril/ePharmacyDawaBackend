@@ -154,8 +154,8 @@ class CompleteUserProfile(APIView):
 class AllUser(APIView):
     @staticmethod
     def get(request):
-        users = User.objects.values("id").all()
-        return Response(users)
+        users = User.objects.all()
+        return Response(UserSerializer(instance=users, many=True).data)
 
 
 class RegisterUser(APIView):
